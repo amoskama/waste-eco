@@ -1,0 +1,762 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoSort AI | Smart Waste Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f0;
+            color: #1a2a1a;
+            line-height: 1.5;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+        .logo i {
+            font-size: 1.8rem;
+            color: #4caf50;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            background: transparent;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #5a6b5a;
+            cursor: pointer;
+            border-radius: 2rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link:hover {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .nav-link.active {
+            background: #2e7d32;
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+            border-radius: 1.5rem;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            color: white;
+        }
+
+        .hero-content {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .hero-content h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero-content .highlight {
+            color: #ffd966;
+        }
+
+        .hero-content p {
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.95;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffd966;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .hero-image i {
+            font-size: 6rem;
+            opacity: 0.3;
+        }
+
+        /* Architecture Flow */
+        .arch-flow {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .flow-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.2rem;
+            background: #f5f5f5;
+            border-radius: 0.8rem;
+            min-width: 90px;
+        }
+
+        .flow-item i {
+            font-size: 1.3rem;
+            color: #2e7d32;
+        }
+
+        .flow-item span {
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .arch-flow i.fa-arrow-right {
+            color: #8bc34a;
+            font-size: 1rem;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.active-dashboard {
+            display: block;
+        }
+
+        .dashboard-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .dashboard-header h2 {
+            font-size: 1.5rem;
+            color: #1a2a1a;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .dashboard-header h2 i {
+            color: #2e7d32;
+        }
+
+        .dashboard-header p {
+            color: #6b7b6b;
+            margin-top: 0.25rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid #e0e8e0;
+        }
+
+        .card-full {
+            grid-column: 1 / -1;
+        }
+
+        .card-header {
+            padding: 1rem 1.2rem;
+            background: #fafafa;
+            border-bottom: 1px solid #e8f0e8;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-header i {
+            font-size: 1.2rem;
+            color: #2e7d32;
+        }
+
+        .card-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1f2a1f;
+        }
+
+        .card-body {
+            padding: 1.2rem;
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 2px dashed #c8e6c9;
+            border-radius: 0.8rem;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            background: #fafaf5;
+            margin-bottom: 1rem;
+        }
+
+        .upload-area:hover {
+            border-color: #2e7d32;
+            background: #f1f8e9;
+        }
+
+        .upload-area i {
+            font-size: 2rem;
+            color: #8bc34a;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-area p {
+            color: #6b7b6b;
+            font-size: 0.85rem;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 180px;
+            border-radius: 0.8rem;
+            margin: 0.8rem 0;
+            object-fit: cover;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: #2e7d32;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #1b5e20;
+        }
+
+        .btn-success {
+            background: #4caf50;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #388e3c;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #c8e6c9;
+            color: #2e7d32;
+        }
+
+        .btn-outline:hover {
+            background: #e8f5e9;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: #2c3e2c;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid #ddd;
+            border-radius: 0.8rem;
+            font-size: 0.85rem;
+            font-family: inherit;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4caf50;
+        }
+
+        /* Progress Bar */
+        .fill-level {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .progress-bar {
+            background: #e8f0e8;
+            border-radius: 0.8rem;
+            overflow: hidden;
+            height: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            background: #4caf50;
+            height: 100%;
+            transition: width 0.3s;
+        }
+
+        /* Result Badge */
+        .result-badge {
+            margin-top: 1rem;
+            padding: 0.6rem;
+            border-radius: 0.8rem;
+            text-align: center;
+            font-weight: 500;
+            font-size: 0.85rem;
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .result-badge.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .result-badge.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        /* Waste Info */
+        .waste-info {
+            background: #f5f5f5;
+            padding: 0.6rem;
+            border-radius: 0.8rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .waste-info strong {
+            color: #2e7d32;
+            text-transform: capitalize;
+        }
+
+        /* Status Message */
+        .status-message {
+            margin-top: 0.8rem;
+            padding: 0.6rem;
+            border-radius: 0.8rem;
+            font-size: 0.8rem;
+            display: none;
+        }
+
+        .status-message.show {
+            display: block;
+        }
+
+        .status-message.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-message.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        /* Lists */
+        .history-list, .requests-list, .completed-list {
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #9e9e9e;
+            padding: 1.5rem;
+            font-size: 0.85rem;
+        }
+
+        .request-item {
+            padding: 0.8rem;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .request-item:last-child {
+            border-bottom: none;
+        }
+
+        .request-info {
+            flex: 1;
+        }
+
+        .request-location {
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .request-type {
+            font-size: 0.75rem;
+            color: #6b7b6b;
+            margin-top: 0.2rem;
+        }
+
+        .confirm-btn {
+            padding: 0.3rem 0.8rem;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 1rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .confirm-btn:hover {
+            background: #1b5e20;
+        }
+
+        .history-item, .completed-item {
+            padding: 0.6rem;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.8rem;
+        }
+
+        /* Inventory Grid */
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .inventory-item {
+            background: #f5f5f5;
+            padding: 0.8rem;
+            border-radius: 0.8rem;
+            text-align: center;
+        }
+
+        .inventory-item i {
+            font-size: 1.2rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .inventory-item span {
+            display: block;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #1a2a1a;
+        }
+
+        .inventory-item small {
+            font-size: 0.7rem;
+            color: #6b7b6b;
+        }
+
+        /* KPI Items */
+        .kpi-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .kpi-item:last-child {
+            border-bottom: none;
+        }
+
+        .kpi-item strong {
+            color: #2e7d32;
+        }
+
+        /* Stats List */
+        .stats-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.4rem 0;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+        /* Impact Metrics */
+        .impact-metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .impact-metric:last-child {
+            border-bottom: none;
+        }
+
+        .impact-metric strong {
+            font-size: 1rem;
+            color: #2e7d32;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .hero-section {
+                padding: 1.5rem;
+                text-align: center;
+            }
+            
+            .hero-stats {
+                justify-content: center;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-container {
+                flex-direction: column;
+            }
+            
+            .arch-flow {
+                flex-direction: column;
+            }
+            
+            .arch-flow i.fa-arrow-right {
+                transform: rotate(90deg);
+            }
+            
+            .inventory-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-leaf"></i>
+                <span>EcoSort AI</span>
+            </div>
+            <div class="nav-links">
+                <button class="nav-link active" data-role="household">
+                    <i class="fas fa-home"></i> Household
+                </button>
+                <button class="nav-link" data-role="collector">
+                    <i class="fas fa-truck"></i> Collector
+                </button>
+                <button class="nav-link" data-role="recycler">
+                    <i class="fas fa-factory"></i> Recycler
+                </button>
+                <button class="nav-link" data-role="analytics">
+                    <i class="fas fa-chart-line"></i> Analytics
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <div class="hero-section">
+            <div class="hero-content">
+                <h1>Smart Waste Management <span class="highlight">for a Cleaner Future</span></h1>
+                <p>Connect households, collectors, and recyclers with AI-powered waste classification. Sustainable, affordable, and scalable.</p>
+                <div class="hero-stats">
+                    <div class="stat"><span class="stat-number">24+</span><span class="stat-label">Households</span></div>
+                    <div class="stat"><span class="stat-number">3</span><span class="stat-label">Collectors</span></div>
+                    <div class="stat"><span class="stat-number">2</span><span class="stat-label">Recyclers</span></div>
+                    <div class="stat"><span class="stat-number">187kg</span><span class="stat-label">CO₂ Saved</span></div>
+                </div>
+            </div>
+            <div class="hero-image"><i class="fas fa-recycle"></i></div>
+        </div>
+
+        <div class="arch-flow">
+            <div class="flow-item"><i class="fas fa-trash-alt"></i><span>Household</span></div>
+            <i class="fas fa-arrow-right"></i>
+            <div class="flow-item"><i class="fas fa-brain"></i><span>AI Classify</span></div>
+            <i class="fas fa-arrow-right"></i>
+            <div class="flow-item"><i class="fas fa-truck"></i><span>Collector</span></div>
+            <i class="fas fa-arrow-right"></i>
+            <div class="flow-item"><i class="fas fa-industry"></i><span>Recycler</span></div>
+        </div>
+
+        <!-- Household Dashboard -->
+        <div id="householdDashboard" class="dashboard active-dashboard">
+            <div class="dashboard-header"><h2><i class="fas fa-home"></i> Household Dashboard</h2><p>Dispose waste, classify with AI, and request pickup</p></div>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="card-header"><i class="fas fa-microchip"></i><h3>AI Waste Classifier</h3></div>
+                    <div class="card-body">
+                        <div class="upload-area" id="uploadArea"><i class="fas fa-cloud-upload-alt"></i><p>Click to upload waste image</p><input type="file" id="wasteImage" accept="image/*" hidden></div>
+                        <img id="preview" class="preview-image" style="display:none;">
+                        <button id="classifyBtn" class="btn btn-primary" disabled><i class="fas fa-brain"></i> Classify Waste</button>
+                        <div id="aiResult" class="result-badge" style="display:none;"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><i class="fas fa-calendar-check"></i><h3>Request Pickup</h3></div>
+                    <div class="card-body">
+                        <div class="form-group"><label>Location</label><input type="text" id="locationInput" placeholder="Enter your address" value="Nairobi, Kenya"></div>
+                        <div class="waste-info"><span>Classified Waste:</span><strong id="currentWasteDisplay">Not classified</strong></div>
+                        <button id="requestPickupBtn" class="btn btn-success"><i class="fas fa-truck"></i> Request Pickup</button>
+                        <div id="pickupStatus" class="status-message"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><i class="fas fa-charging-station"></i><h3>Smart Bin Status</h3></div>
+                    <div class="card-body">
+                        <div class="fill-level"><span>Fill Level</span><span id="fillLevel">35</span>%</div>
+                        <div class="progress-bar"><div class="progress-fill" id="fillProgressFill" style="width:35%"></div></div>
+                        <button id="simulateFillBtn" class="btn btn-outline"><i class="fas fa-plus"></i> Simulate Fill +20%</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><i class="fas fa-history"></i><h3>Recent Requests</h3></div>
+                    <div class="card-body"><div id="householdRequestsList" class="history-list"><div class="empty-state">No requests yet</div></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Collector Dashboard -->
+        <div id="collectorDashboard" class="dashboard">
+            <div class="dashboard-header"><h2><i class="fas fa-truck"></i> Collector Dashboard</h2><p>View and manage pickup requests</p></div>
+            <div class="dashboard-grid">
+                <div class="card card-full"><div class="card-header"><i class="fas fa-clock"></i><h3>Pending Pickups</h3></div><div class="card-body"><div id="pendingRequestsList" class="requests-list"><div class="empty-state">No pending requests</div></div></div></div>
+                <div class="card card-full"><div class="card-header"><i class="fas fa-check-circle"></i><h3>Recently Completed</h3></div><div class="card-body"><ul id="completedLog" class="completed-list" style="list-style:none;"></ul></div></div>
+            </div>
+        </div>
+
+        <!-- Recycler Dashboard -->
+        <div id="recyclerDashboard" class="dashboard">
+            <div class="dashboard-header"><h2><i class="fas fa-factory"></i> Recycler Dashboard</h2><p>Manage sorted waste inventory</p></div>
+            <div class="dashboard-grid">
+                <div class="card"><div class="card-header"><i class="fas fa-boxes"></i><h3>Sorted Waste Inventory</h3></div><div class="card-body"><div id="wasteInventory" class="inventory-grid"></div><button id="scheduleRecyclerPickupBtn" class="btn btn-primary"><i class="fas fa-calendar-alt"></i> Schedule Bulk Pickup</button><div id="recyclerMsg" class="status-message"></div></div></div>
+                <div class="card"><div class="card-header"><i class="fas fa-chart-line"></i><h3>Performance KPIs</h3></div><div class="card-body"><div class="kpi-item"><span>♻️ Plastic</span><strong>124 kg</strong></div><div class="kpi-item"><span>📄 Paper</span><strong>86 kg</strong></div><div class="kpi-item"><span>🥫 Metal</span><strong>42 kg</strong></div><div class="kpi-item"><span>🍂 Organic</span><strong>98 kg</strong></div></div></div>
+            </div>
+        </div>
+
+        <!-- Analytics Dashboard -->
+        <div id="analyticsDashboard" class="dashboard">
+            <div class="dashboard-header"><h2><i class="fas fa-chart-line"></i> Analytics Dashboard</h2><p>System-wide impact metrics</p></div>
+            <div class="dashboard-grid">
+                <div class="card"><div class="card-header"><i class="fas fa-chart-bar"></i><h3>Waste Collected by Type</h3></div><div class="card-body"><div id="totalWasteStats" class="stats-list"></div></div></div>
+                <div class="card"><div class="card-header"><i class="fas fa-globe-africa"></i><h3>Environmental Impact</h3></div><div class="card-body"><div class="impact-metric"><span>Recycling Rate</span><strong id="recyclingRate">0%</strong></div><div class="impact-metric"><span>Completed Pickups</span><strong id="totalPickupsCompleted">0</strong></div><div class="impact-metric"><span>CO₂ Avoided</span><strong>187 kg</strong></div></div></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
