@@ -1,762 +1,1219 @@
-<!-- index.html -->
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EcoSort AI | Smart Waste Management System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>♻️ Waste-Eco Pro | AI Classification + Real‑time + Hardware Simulation</title>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- TensorFlow.js + MobileNet -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js"></script>
+    <!-- Google Analytics placeholder (replace ID for real tracking) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'GA_MEASUREMENT_ID');
+    </script>
     <style>
+        :root {
+            --primary: linear-gradient(135deg, #2b6cb0, #5a67d8);
+            --success: linear-gradient(135deg, #2f855a, #48bb78);
+            --warning: linear-gradient(135deg, #dd6b20, #ed8936);
+            --danger: linear-gradient(135deg, #c53030, #e53e3e);
+            --glass: rgba(255, 255, 255, 0.07);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --dark-bg: radial-gradient(circle at 10% 20%, rgb(15, 25, 35) 0%, rgb(10, 18, 28) 100%);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f4f0;
-            color: #1a2a1a;
-            line-height: 1.5;
+            background: var(--dark-bg);
+            color: #f0f4fa;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        /* Navigation */
-        .navbar {
-            background: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #2e7d32;
-        }
-
-        .logo i {
-            font-size: 1.8rem;
-            color: #4caf50;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .nav-link {
-            padding: 0.6rem 1.2rem;
-            border: none;
-            background: transparent;
-            font-size: 0.95rem;
-            font-weight: 500;
-            color: #5a6b5a;
-            cursor: pointer;
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
             border-radius: 2rem;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
         }
 
-        .nav-link:hover {
-            background: #e8f5e9;
-            color: #2e7d32;
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 35px 65px rgba(0, 0, 0, 0.3);
         }
 
-        .nav-link.active {
-            background: #2e7d32;
-            color: white;
-        }
-
-        /* Main Content */
-        .main-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        /* Hero Section */
-        .hero-section {
-            background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
-            border-radius: 1.5rem;
-            padding: 3rem;
-            margin-bottom: 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 2rem;
-            color: white;
-        }
-
-        .hero-content {
-            flex: 1;
-            min-width: 280px;
-        }
-
-        .hero-content h1 {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-        }
-
-        .hero-content .highlight {
-            color: #ffd966;
-        }
-
-        .hero-content p {
-            font-size: 1rem;
-            margin-bottom: 1.5rem;
-            opacity: 0.95;
-        }
-
-        .hero-stats {
-            display: flex;
-            gap: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .stat {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .stat-number {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #ffd966;
-        }
-
-        .stat-label {
-            font-size: 0.8rem;
-            opacity: 0.9;
-        }
-
-        .hero-image i {
-            font-size: 6rem;
-            opacity: 0.3;
-        }
-
-        /* Architecture Flow */
-        .arch-flow {
-            background: white;
-            border-radius: 1rem;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .flow-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.8rem 1.2rem;
-            background: #f5f5f5;
-            border-radius: 0.8rem;
-            min-width: 90px;
-        }
-
-        .flow-item i {
-            font-size: 1.3rem;
-            color: #2e7d32;
-        }
-
-        .flow-item span {
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .arch-flow i.fa-arrow-right {
-            color: #8bc34a;
-            font-size: 1rem;
-        }
-
-        /* Dashboard */
-        .dashboard {
-            display: none;
-        }
-
-        .dashboard.active-dashboard {
-            display: block;
-        }
-
-        .dashboard-header {
-            margin-bottom: 1.5rem;
-        }
-
-        .dashboard-header h2 {
-            font-size: 1.5rem;
-            color: #1a2a1a;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .dashboard-header h2 i {
-            color: #2e7d32;
-        }
-
-        .dashboard-header p {
-            color: #6b7b6b;
-            margin-top: 0.25rem;
-        }
-
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 1.5rem;
-        }
-
-        /* Cards */
-        .card {
-            background: white;
-            border-radius: 1rem;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            border: 1px solid #e0e8e0;
-        }
-
-        .card-full {
-            grid-column: 1 / -1;
-        }
-
-        .card-header {
-            padding: 1rem 1.2rem;
-            background: #fafafa;
-            border-bottom: 1px solid #e8f0e8;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .card-header i {
-            font-size: 1.2rem;
-            color: #2e7d32;
-        }
-
-        .card-header h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #1f2a1f;
-        }
-
-        .card-body {
-            padding: 1.2rem;
-        }
-
-        /* Upload Area */
-        .upload-area {
-            border: 2px dashed #c8e6c9;
-            border-radius: 0.8rem;
-            padding: 1.5rem;
-            text-align: center;
-            cursor: pointer;
-            background: #fafaf5;
-            margin-bottom: 1rem;
-        }
-
-        .upload-area:hover {
-            border-color: #2e7d32;
-            background: #f1f8e9;
-        }
-
-        .upload-area i {
-            font-size: 2rem;
-            color: #8bc34a;
-            margin-bottom: 0.5rem;
-        }
-
-        .upload-area p {
-            color: #6b7b6b;
-            font-size: 0.85rem;
-        }
-
-        .preview-image {
-            max-width: 100%;
-            max-height: 180px;
-            border-radius: 0.8rem;
-            margin: 0.8rem 0;
-            object-fit: cover;
-        }
-
-        /* Buttons */
         .btn {
-            padding: 0.6rem 1.2rem;
             border: none;
-            border-radius: 2rem;
             font-weight: 600;
-            font-size: 0.85rem;
+            border-radius: 2rem;
+            padding: 0.9rem 1.8rem;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+            backdrop-filter: blur(8px);
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            font-family: inherit;
         }
 
         .btn-primary {
-            background: #2e7d32;
+            background: var(--primary);
             color: white;
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            background: #1b5e20;
         }
 
         .btn-success {
-            background: #4caf50;
+            background: var(--success);
             color: white;
         }
 
-        .btn-success:hover {
-            background: #388e3c;
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
         }
 
         .btn-outline {
             background: transparent;
-            border: 1px solid #c8e6c9;
-            color: #2e7d32;
+            border: 2px solid var(--glass-border);
+            color: white;
         }
 
-        .btn-outline:hover {
-            background: #e8f5e9;
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* Form Elements */
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.4rem;
-            font-weight: 500;
+        .btn-sm {
+            padding: 0.6rem 1.4rem;
             font-size: 0.85rem;
-            color: #2c3e2c;
         }
 
-        .form-group input {
-            width: 100%;
-            padding: 0.6rem;
-            border: 1px solid #ddd;
-            border-radius: 0.8rem;
-            font-size: 0.85rem;
-            font-family: inherit;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #4caf50;
-        }
-
-        /* Progress Bar */
-        .fill-level {
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(16px);
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-            font-size: 0.85rem;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s;
         }
 
-        .progress-bar {
-            background: #e8f0e8;
-            border-radius: 0.8rem;
-            overflow: hidden;
-            height: 8px;
-            margin-bottom: 1rem;
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
         }
 
-        .progress-fill {
-            background: #4caf50;
-            height: 100%;
-            transition: width 0.3s;
+        .auth-card {
+            background: rgba(20, 30, 45, 0.95);
+            backdrop-filter: blur(24px);
+            border-radius: 2.5rem;
+            padding: 2.5rem;
+            width: min(90%, 500px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
 
-        /* Result Badge */
-        .result-badge {
-            margin-top: 1rem;
-            padding: 0.6rem;
-            border-radius: 0.8rem;
-            text-align: center;
-            font-weight: 500;
-            font-size: 0.85rem;
-            background: #e8f5e9;
-            color: #2e7d32;
+        .input-field {
+            width: 100%;
+            padding: 1.1rem 1.4rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1.8rem;
+            color: white;
+            font-size: 1rem;
         }
 
-        .result-badge.success {
-            background: #e8f5e9;
-            color: #2e7d32;
+        .input-field:focus {
+            outline: none;
+            border-color: #5a67d8;
+            box-shadow: 0 0 0 4px rgba(90, 103, 216, 0.1);
         }
 
-        .result-badge.error {
-            background: #ffebee;
-            color: #c62828;
-        }
-
-        /* Waste Info */
-        .waste-info {
-            background: #f5f5f5;
-            padding: 0.6rem;
-            border-radius: 0.8rem;
-            margin-bottom: 1rem;
+        .navbar {
+            position: sticky;
+            top: 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.85rem;
+            padding: 1.2rem 3rem;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
         }
 
-        .waste-info strong {
-            color: #2e7d32;
-            text-transform: capitalize;
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #b6e1fc, #c3a0ff, #ffd6e7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
-        /* Status Message */
-        .status-message {
-            margin-top: 0.8rem;
-            padding: 0.6rem;
-            border-radius: 0.8rem;
+        .role-badge {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 2rem;
+            padding: 0.4rem 1.2rem;
             font-size: 0.8rem;
-            display: none;
+            font-weight: 700;
+            text-transform: uppercase;
         }
 
-        .status-message.show {
-            display: block;
+        .role-admin {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
         }
 
-        .status-message.success {
-            background: #e8f5e9;
-            color: #2e7d32;
+        .role-household {
+            background: linear-gradient(135deg, #667eea, #764ba2);
         }
 
-        .status-message.error {
-            background: #ffebee;
-            color: #c62828;
+        .role-collector {
+            background: linear-gradient(135deg, #f6d365, #fda085);
         }
 
-        /* Lists */
-        .history-list, .requests-list, .completed-list {
-            max-height: 280px;
-            overflow-y: auto;
+        .role-recycler {
+            background: linear-gradient(135deg, #56ab2f, #a8e6cf);
+            color: #1a202c;
         }
 
-        .empty-state {
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #4c6ef5, #9f7aea);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            cursor: pointer;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2.5rem 2rem;
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, white, #e2e8f0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .stat-card {
+            padding: 2rem;
             text-align: center;
-            color: #9e9e9e;
-            padding: 1.5rem;
-            font-size: 0.85rem;
         }
 
-        .request-item {
-            padding: 0.8rem;
-            border-bottom: 1px solid #f0f0f0;
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, white, #e2e8f0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .list-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 0.5rem;
+            gap: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        .request-item:last-child {
-            border-bottom: none;
+        .product-tile {
+            padding: 2rem;
+            text-align: center;
+            height: 100%;
         }
 
-        .request-info {
-            flex: 1;
-        }
-
-        .request-location {
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
-
-        .request-type {
-            font-size: 0.75rem;
-            color: #6b7b6b;
-            margin-top: 0.2rem;
-        }
-
-        .confirm-btn {
-            padding: 0.3rem 0.8rem;
-            background: #2e7d32;
-            color: white;
-            border: none;
-            border-radius: 1rem;
-            cursor: pointer;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        .confirm-btn:hover {
-            background: #1b5e20;
-        }
-
-        .history-item, .completed-item {
-            padding: 0.6rem;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 0.8rem;
-        }
-
-        /* Inventory Grid */
-        .inventory-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.8rem;
+        .product-icon {
+            font-size: 4rem;
             margin-bottom: 1rem;
         }
 
-        .inventory-item {
-            background: #f5f5f5;
-            padding: 0.8rem;
-            border-radius: 0.8rem;
-            text-align: center;
+        .product-price {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #48bb78;
+            margin: 1rem 0;
         }
 
-        .inventory-item i {
-            font-size: 1.2rem;
-            margin-bottom: 0.3rem;
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 1rem;
+            border-radius: 2rem;
         }
 
-        .inventory-item span {
+        .nav-tab {
+            padding: 1rem 2rem;
+            background: transparent;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .nav-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .admin-only {
+            display: none;
+        }
+
+        .admin-access .admin-only {
             display: block;
-            font-size: 1rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.3s;
+        }
+
+        .full-warning {
+            color: #ff6b6b;
             font-weight: bold;
-            color: #1a2a1a;
+            animation: pulse 1s infinite;
         }
 
-        .inventory-item small {
-            font-size: 0.7rem;
-            color: #6b7b6b;
+        @keyframes pulse {
+            0% {
+                opacity: 0.7;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.7;
+            }
         }
 
-        /* KPI Items */
-        .kpi-item {
+        .composition-row {
             display: flex;
             justify-content: space-between;
-            padding: 0.6rem 0;
-            border-bottom: 1px solid #f0f0f0;
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
         }
 
-        .kpi-item:last-child {
-            border-bottom: none;
-        }
-
-        .kpi-item strong {
-            color: #2e7d32;
-        }
-
-        /* Stats List */
-        .stats-list {
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 10px;
         }
 
-        .stat-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.4rem 0;
+        .toast {
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(12px);
+            border-left: 4px solid;
+            padding: 12px 20px;
+            border-radius: 12px;
+            color: white;
+            max-width: 300px;
+            animation: slideIn 0.3s ease;
         }
 
-        .stat-value {
-            font-weight: bold;
-            color: #2e7d32;
+        .toast.success {
+            border-left-color: #48bb78;
         }
 
-        /* Impact Metrics */
-        .impact-metric {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.8rem 0;
-            border-bottom: 1px solid #f0f0f0;
+        .toast.warning {
+            border-left-color: #ed8936;
         }
 
-        .impact-metric:last-child {
-            border-bottom: none;
+        .toast.error {
+            border-left-color: #e53e3e;
         }
 
-        .impact-metric strong {
-            font-size: 1rem;
-            color: #2e7d32;
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
-        /* Responsive */
+        .mb-2 {
+            margin-bottom: 1rem;
+        }
+
+        .mt-2 {
+            margin-top: 1rem;
+        }
+
+        .ml-2 {
+            margin-left: 0.5rem;
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
         @media (max-width: 768px) {
-            .main-content {
-                padding: 1rem;
+            .navbar {
+                padding: 1rem 1.5rem;
             }
-            
-            .hero-section {
-                padding: 1.5rem;
-                text-align: center;
+
+            .container {
+                padding: 1.5rem 1rem;
             }
-            
-            .hero-stats {
-                justify-content: center;
-            }
-            
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .nav-container {
-                flex-direction: column;
-            }
-            
-            .arch-flow {
-                flex-direction: column;
-            }
-            
-            .arch-flow i.fa-arrow-right {
-                transform: rotate(90deg);
-            }
-            
-            .inventory-grid {
+
+            .stats-grid,
+            .shop-grid {
                 grid-template-columns: 1fr;
             }
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+
 <body>
-    <div class="navbar">
-        <div class="nav-container">
-            <div class="logo">
-                <i class="fas fa-leaf"></i>
-                <span>EcoSort AI</span>
+    <!-- AUTH MODAL -->
+    <div id="authModal" class="modal-overlay">
+        <div class="auth-card">
+            <div
+                style="display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 1.5rem;">
+                <button id="tabLoginBtn" class="btn btn-outline btn-sm" onclick="switchAuthTab('login')">🔐
+                    Login</button>
+                <button id="tabSignupBtn" class="btn btn-outline btn-sm" onclick="switchAuthTab('signup')">📝 Sign
+                    Up</button>
             </div>
-            <div class="nav-links">
-                <button class="nav-link active" data-role="household">
-                    <i class="fas fa-home"></i> Household
-                </button>
-                <button class="nav-link" data-role="collector">
-                    <i class="fas fa-truck"></i> Collector
-                </button>
-                <button class="nav-link" data-role="recycler">
-                    <i class="fas fa-factory"></i> Recycler
-                </button>
-                <button class="nav-link" data-role="analytics">
-                    <i class="fas fa-chart-line"></i> Analytics
-                </button>
+            <div id="loginPanel">
+                <input type="email" id="loginEmail" class="input-field mb-2" placeholder="📧 Email address">
+                <input type="password" id="loginPassword" class="input-field mb-2" placeholder="🔒 Password">
+                <button class="btn btn-primary w-full" onclick="handleLogin()">Enter →</button>
+                <div style="margin-top: 1.5rem; text-align:center; opacity:0.8;">👑 admin@waste.com / pass &nbsp;|&nbsp;
+                    🏠 demo@house.com / pass</div>
+            </div>
+            <div id="signupPanel" style="display:none;">
+                <input type="text" id="signupName" class="input-field mb-2" placeholder="👤 Full name">
+                <input type="email" id="signupEmail" class="input-field mb-2" placeholder="📧 Email">
+                <input type="password" id="signupPassword" class="input-field mb-2" placeholder="🔒 Password">
+                <select id="signupRole" class="input-field mb-2">
+                    <option value="household">🏠 Household User</option>
+                    <option value="collector">🚛 Waste Collector</option>
+                    <option value="recycler">♻️ Recycler</option>
+                    <option value="admin">👑 Admin (Full Access)</option>
+                </select>
+                <button class="btn btn-success w-full" onclick="handleSignup()">Create Account</button>
             </div>
         </div>
     </div>
 
-    <main class="main-content">
-        <div class="hero-section">
-            <div class="hero-content">
-                <h1>Smart Waste Management <span class="highlight">for a Cleaner Future</span></h1>
-                <p>Connect households, collectors, and recyclers with AI-powered waste classification. Sustainable, affordable, and scalable.</p>
-                <div class="hero-stats">
-                    <div class="stat"><span class="stat-number">24+</span><span class="stat-label">Households</span></div>
-                    <div class="stat"><span class="stat-number">3</span><span class="stat-label">Collectors</span></div>
-                    <div class="stat"><span class="stat-number">2</span><span class="stat-label">Recyclers</span></div>
-                    <div class="stat"><span class="stat-number">187kg</span><span class="stat-label">CO₂ Saved</span></div>
-                </div>
+    <!-- TOAST CONTAINER -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="logo">♻️ Waste-Eco Pro | AI + Real‑time</div>
+        <div id="guestActions" style="display:flex; gap:1.5rem;"><button class="btn btn-primary btn-sm"
+                onclick="openAuthModal()">Sign in</button></div>
+        <div id="userArea" style="display:none; align-items:center; gap:1.5rem;">
+            <span id="userRoleBadge" class="role-badge"></span>
+            <div class="avatar" id="userAvatar" onclick="toggleUserMenu()">👤</div>
+            <div id="userDropdown"
+                style="display:none; position:absolute; right:3rem; top:100%; background:rgba(20,30,45,0.95); backdrop-filter:blur(20px); border-radius:1.5rem; padding:1.5rem; min-width:200px; border:1px solid rgba(255,255,255,0.15);">
+                <div class="nav-tab" onclick="showTab('overview'); toggleUserMenu()">📊 Dashboard</div>
+                <div class="nav-tab" onclick="showTab('profile'); toggleUserMenu()">👤 Profile</div>
+                <div class="admin-only nav-tab" onclick="showTab('admin'); toggleUserMenu()">⚙️ Admin Panel</div>
+                <hr style="border-color:rgba(255,255,255,0.1); margin:1rem 0;">
+                <div class="nav-tab" onclick="logout(); toggleUserMenu()" style="color:#e53e3e;">🚪 Logout</div>
             </div>
-            <div class="hero-image"><i class="fas fa-recycle"></i></div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- GUEST LANDING -->
+        <div id="guestLanding">
+            <div class="glass-card" style="text-align:center; padding:4rem 3rem; margin-bottom:3rem;">
+                <h1
+                    style="font-size:3.5rem; font-weight:900; margin-bottom:1.5rem; background:linear-gradient(135deg, #b6e1fc, #c3a0ff); -webkit-background-clip:text; background-clip:text; color:transparent;">
+                    Smart Waste Ecosystem with AI</h1>
+                <p style="font-size:1.4rem; opacity:0.9; margin-bottom:3rem;">Households get AI‑powered waste
+                    classification + sensors + real‑time collaboration</p>
+                <button class="btn btn-success" style="padding:1.5rem 4rem;" onclick="openAuthModal()">🚀 Get
+                    Started</button>
+            </div>
+            <h2 class="section-title">🛒 Smart Bins Store</h2>
+            <div id="guestShopGrid" class="shop-grid"></div>
         </div>
 
-        <div class="arch-flow">
-            <div class="flow-item"><i class="fas fa-trash-alt"></i><span>Household</span></div>
-            <i class="fas fa-arrow-right"></i>
-            <div class="flow-item"><i class="fas fa-brain"></i><span>AI Classify</span></div>
-            <i class="fas fa-arrow-right"></i>
-            <div class="flow-item"><i class="fas fa-truck"></i><span>Collector</span></div>
-            <i class="fas fa-arrow-right"></i>
-            <div class="flow-item"><i class="fas fa-industry"></i><span>Recycler</span></div>
-        </div>
-
-        <!-- Household Dashboard -->
-        <div id="householdDashboard" class="dashboard active-dashboard">
-            <div class="dashboard-header"><h2><i class="fas fa-home"></i> Household Dashboard</h2><p>Dispose waste, classify with AI, and request pickup</p></div>
-            <div class="dashboard-grid">
-                <div class="card">
-                    <div class="card-header"><i class="fas fa-microchip"></i><h3>AI Waste Classifier</h3></div>
-                    <div class="card-body">
-                        <div class="upload-area" id="uploadArea"><i class="fas fa-cloud-upload-alt"></i><p>Click to upload waste image</p><input type="file" id="wasteImage" accept="image/*" hidden></div>
-                        <img id="preview" class="preview-image" style="display:none;">
-                        <button id="classifyBtn" class="btn btn-primary" disabled><i class="fas fa-brain"></i> Classify Waste</button>
-                        <div id="aiResult" class="result-badge" style="display:none;"></div>
+        <!-- MAIN DASHBOARD -->
+        <div id="mainDashboard" style="display:none;">
+            <div class="glass-card" style="padding:2.5rem; margin-bottom:3rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:2rem;">
+                    <div>
+                        <h1 style="font-size:2.8rem; font-weight:900;">Welcome back!</h1><span id="welcomeRoleBadge"
+                            class="role-badge"></span>
+                    </div>
+                    <div class="nav-tabs" id="dashboardTabs">
+                        <div class="nav-tab active" data-tab="overview">📊 Overview</div>
+                        <div class="nav-tab" data-tab="activity">📋 Activity</div>
+                        <div class="nav-tab admin-only" data-tab="admin">⚙️ Admin</div>
                     </div>
                 </div>
-                <div class="card">
-                    <div class="card-header"><i class="fas fa-calendar-check"></i><h3>Request Pickup</h3></div>
-                    <div class="card-body">
-                        <div class="form-group"><label>Location</label><input type="text" id="locationInput" placeholder="Enter your address" value="Nairobi, Kenya"></div>
-                        <div class="waste-info"><span>Classified Waste:</span><strong id="currentWasteDisplay">Not classified</strong></div>
-                        <button id="requestPickupBtn" class="btn btn-success"><i class="fas fa-truck"></i> Request Pickup</button>
-                        <div id="pickupStatus" class="status-message"></div>
+            </div>
+            <div id="overviewTab" class="stats-grid"></div>
+            <div id="activityTab" class="glass-card" style="display:none; padding:2rem;"></div>
+            <div id="adminTab" class="glass-card" style="display:none; padding:2rem;"></div>
+        </div>
+
+        <!-- PROFILE PANEL -->
+        <div id="profilePanel" class="glass-card" style="display:none; padding:3rem;"></div>
+    </div>
+
+    <script>
+        // ========== SECURITY & UTILITIES ==========
+        const MAX_FILE_SIZE = 5 * 1024 * 1024;
+        const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+        const rateLimitMap = new Map();
+
+        function sanitizeInput(input) {
+            if (typeof input !== 'string') return '';
+            return input.replace(/[<>]/g, '').trim();
+        }
+
+        function rateLimit(email, limit = 5, windowMs = 60000) {
+            const now = Date.now();
+            const record = rateLimitMap.get(email) || { attempts: 0, firstAttempt: now };
+            if (now - record.firstAttempt > windowMs) { record.attempts = 0; record.firstAttempt = now; }
+            if (record.attempts >= limit) throw new Error('Too many login attempts. Try again later.');
+            record.attempts++;
+            rateLimitMap.set(email, record);
+        }
+
+        function validateImage(file) {
+            if (!file) return { valid: false, error: 'No file selected' };
+            if (!ALLOWED_TYPES.includes(file.type)) return { valid: false, error: 'Invalid file type. Use JPG, PNG, or WebP.' };
+            if (file.size > MAX_FILE_SIZE) return { valid: false, error: 'File too large (max 5MB).' };
+            return { valid: true };
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerText = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        function trackEvent(category, action, label) {
+            if (typeof gtag !== 'undefined') gtag('event', action, { event_category: category, event_label: label });
+            console.log(`[GA] ${category}/${action}/${label}`);
+        }
+
+        // ========== REAL‑TIME BROADCAST CHANNEL ==========
+        const broadcastChannel = new BroadcastChannel('waste_eco_channel');
+        broadcastChannel.onmessage = (event) => {
+            const { type, data } = event.data;
+            if (type === 'toast') {
+                showToast(data.message, data.type);
+                if (currentUser && (document.getElementById('activityTab').style.display !== 'none' || document.getElementById('overviewTab').style.display !== 'none')) {
+                    if (document.getElementById('activityTab').style.display !== 'none') renderActivity();
+                    if (document.getElementById('overviewTab').style.display !== 'none') renderStats();
+                    if (currentUser.role === 'admin' && document.getElementById('adminTab').style.display !== 'none') renderAdminPanel();
+                }
+            }
+        };
+
+        function broadcastToast(message, type = 'info') {
+            broadcastChannel.postMessage({ type: 'toast', data: { message, type } });
+        }
+
+        // ========== DATA & STATE ==========
+        let currentUser = null;
+        let allUsers = JSON.parse(localStorage.getItem('waste_eco_users')) || [];
+        let collectionRequests = JSON.parse(localStorage.getItem('waste_collections')) || [];
+        let recyclingOrders = JSON.parse(localStorage.getItem('recycling_orders')) || [];
+        let allOrders = JSON.parse(localStorage.getItem('waste_orders')) || [];
+        let smartBins = JSON.parse(localStorage.getItem('smart_bins')) || [];
+
+        const products = [
+            { id: 101, name: 'AI Smart Bin Pro', price: 4200, icon: '🗑️', stock: 25, desc: 'Auto-sorting + sensors' },
+            { id: 102, name: 'Compost Master 3000', price: 5900, icon: '🌱', stock: 15, desc: 'Smart composting' },
+            { id: 103, name: 'Recycler Station', price: 8900, icon: '♻️', stock: 8, desc: 'Industrial grade' },
+            { id: 104, name: 'Sensor Waste Can', price: 3100, icon: '📡', stock: 32, desc: 'Overflow alerts' }
+        ];
+
+        // Mapping for AI classification
+        const objectToWaste = {
+            'bottle': 'plastic', 'plastic': 'plastic', 'bag': 'plastic', 'cup': 'plastic',
+            'apple': 'organic', 'banana': 'organic', 'orange': 'organic', 'food': 'organic', 'leaf': 'organic',
+            'newspaper': 'paper', 'book': 'paper', 'cardboard': 'paper', 'paper': 'paper',
+            'can': 'metal', 'soda can': 'metal', 'tin': 'metal',
+            'glass': 'glass', 'jar': 'glass'
+        };
+
+        function classifyWasteWithAI(imageElement, binId, callback) {
+            if (!window.mobilenetModel) {
+                mobilenet.load().then(model => {
+                    window.mobilenetModel = model;
+                    classify(imageElement, binId, callback);
+                });
+            } else {
+                classify(imageElement, binId, callback);
+            }
+        }
+
+        function classify(imgElement, binId, callback) {
+            window.mobilenetModel.classify(imgElement).then(predictions => {
+                if (predictions && predictions.length > 0) {
+                    const topLabel = predictions[0].className.toLowerCase();
+                    let wasteType = 'mixed';
+                    for (const [key, val] of Object.entries(objectToWaste)) {
+                        if (topLabel.includes(key)) { wasteType = val; break; }
+                    }
+                    callback(wasteType, topLabel);
+                } else {
+                    callback('mixed', 'unknown');
+                }
+            }).catch(err => {
+                console.error(err);
+                callback('mixed', 'error');
+            });
+        }
+
+        function updateBinCompositionWithWaste(bin, wasteType, amountPercent = 5) {
+            const current = bin.composition;
+            let newComp = { ...current };
+            newComp[wasteType] = Math.min(70, (newComp[wasteType] || 0) + amountPercent);
+            let total = Object.values(newComp).reduce((a, b) => a + b, 0);
+            if (total > 100) {
+                let factor = 100 / total;
+                for (let k in newComp) newComp[k] = Math.round(newComp[k] * factor);
+            } else if (total < 100) {
+                let diff = 100 - total;
+                for (let k in newComp) newComp[k] += Math.round(diff / 5);
+            }
+            bin.composition = newComp;
+            persistAll();
+        }
+
+        function persistAll() {
+            localStorage.setItem('waste_eco_users', JSON.stringify(allUsers));
+            localStorage.setItem('waste_collections', JSON.stringify(collectionRequests));
+            localStorage.setItem('recycling_orders', JSON.stringify(recyclingOrders));
+            localStorage.setItem('waste_orders', JSON.stringify(allOrders));
+            localStorage.setItem('smart_bins', JSON.stringify(smartBins));
+            if (currentUser) localStorage.setItem('waste_session', JSON.stringify(currentUser));
+        }
+
+        function addNotification(userId, message, type = 'info') {
+            if (currentUser && currentUser.id === userId) showToast(message, type);
+            broadcastToast(message, type);
+        }
+
+        function ensureHouseholdBins(householdId, householdName) {
+            const existing = smartBins.filter(b => b.householdId === householdId);
+            if (existing.length === 0) {
+                smartBins.push({
+                    id: Date.now(),
+                    householdId,
+                    name: 'Main Bin',
+                    fullness: Math.floor(Math.random() * 40) + 10,
+                    composition: {
+                        plastic: Math.floor(Math.random() * 40) + 10,
+                        organic: Math.floor(Math.random() * 40) + 10,
+                        paper: Math.floor(Math.random() * 30) + 5,
+                        glass: Math.floor(Math.random() * 20) + 5,
+                        metal: Math.floor(Math.random() * 15) + 2
+                    },
+                    lastUpdated: new Date().toISOString()
+                });
+                let comp = smartBins[smartBins.length - 1].composition;
+                let total = comp.plastic + comp.organic + comp.paper + comp.glass + comp.metal;
+                if (total !== 100) {
+                    let factor = 100 / total;
+                    for (let k in comp) comp[k] = Math.round(comp[k] * factor);
+                }
+            }
+            persistAll();
+        }
+
+        function seedDemoData() {
+            if (!allUsers.find(u => u.email === 'admin@waste.com')) {
+                allUsers = [
+                    { id: 1, name: 'Master Admin', email: 'admin@waste.com', password: 'pass', role: 'admin', balance: 12500, createdAt: new Date().toISOString() },
+                    { id: 2, name: 'Jane Household', email: 'demo@house.com', password: 'pass', role: 'household', balance: 2500, createdAt: new Date().toISOString() },
+                    { id: 3, name: 'Carl Collector', email: 'collector@demo.com', password: 'pass', role: 'collector', balance: 3200, createdAt: new Date().toISOString() },
+                    { id: 4, name: 'Recycle Pro', email: 'recycler@demo.com', password: 'pass', role: 'recycler', balance: 8700, createdAt: new Date().toISOString() }
+                ];
+                persistAll();
+            }
+            allUsers.filter(u => u.role === 'household').forEach(h => ensureHouseholdBins(h.id, h.name));
+        }
+        seedDemoData();
+
+        let interval = null;
+        function startRealTimeSimulation() {
+            if (interval) clearInterval(interval);
+            interval = setInterval(() => {
+                if (!currentUser) return;
+                if (currentUser.role === 'household') {
+                    const userBins = smartBins.filter(b => b.householdId === currentUser.id);
+                    userBins.forEach(bin => {
+                        let increase = Math.floor(Math.random() * 3) + 1;
+                        let newFullness = Math.min(100, bin.fullness + increase);
+                        if (newFullness >= 95 && bin.fullness < 95) {
+                            addNotification(currentUser.id, `⚠️ Your bin "${bin.name}" is nearly full (${newFullness}%)! Schedule collection.`, 'warning');
+                        }
+                        bin.fullness = newFullness;
+                        bin.lastUpdated = new Date().toISOString();
+                    });
+                    persistAll();
+                    if (document.getElementById('activityTab').style.display !== 'none' && currentUser.role === 'household') renderActivity();
+                    if (document.getElementById('overviewTab').style.display !== 'none') renderStats();
+                }
+                if (currentUser.role === 'collector' && document.getElementById('activityTab').style.display !== 'none') renderActivity();
+            }, 30000);
+        }
+
+        // ========== AUTH ==========
+        function openAuthModal() { document.getElementById('authModal').classList.add('active'); }
+        function closeAuthModal() { document.getElementById('authModal').classList.remove('active'); }
+        function switchAuthTab(tab) {
+            document.querySelectorAll('#loginPanel, #signupPanel').forEach(p => p.style.display = 'none');
+            document.getElementById(tab + 'Panel').style.display = 'block';
+            document.querySelectorAll('#tabLoginBtn, #tabSignupBtn').forEach(b => b.classList.remove('btn-primary'));
+            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Btn').classList.add('btn-primary');
+        }
+        window.handleLogin = () => {
+            try {
+                const email = sanitizeInput(document.getElementById('loginEmail').value);
+                const password = document.getElementById('loginPassword').value;
+                if (!email || !password) throw new Error('Email and password required');
+                rateLimit(email);
+                const user = allUsers.find(u => u.email === email && u.password === password);
+                if (user) {
+                    currentUser = { ...user };
+                    closeAuthModal();
+                    updateUIAfterLogin();
+                    startRealTimeSimulation();
+                    trackEvent('auth', 'login', user.role);
+                    showToast(`Welcome back, ${user.name}!`, 'success');
+                } else {
+                    throw new Error('Invalid credentials');
+                }
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        };
+        window.handleSignup = () => {
+            try {
+                let name = sanitizeInput(document.getElementById('signupName').value);
+                let email = sanitizeInput(document.getElementById('signupEmail').value);
+                const password = document.getElementById('signupPassword').value;
+                const role = document.getElementById('signupRole').value;
+                if (!name || !email || !password) throw new Error('All fields required');
+                if (allUsers.find(u => u.email === email)) throw new Error('Email already exists');
+                const newUser = { id: Date.now(), name, email, password, role, balance: role === 'household' ? 2000 : (role === 'collector' ? 1000 : 5000), createdAt: new Date().toISOString() };
+                allUsers.push(newUser);
+                if (role === 'household') ensureHouseholdBins(newUser.id, name);
+                currentUser = newUser;
+                persistAll();
+                closeAuthModal();
+                updateUIAfterLogin();
+                startRealTimeSimulation();
+                trackEvent('auth', 'signup', role);
+                showToast('Account created successfully!', 'success');
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        };
+        function updateUIAfterLogin() {
+            document.getElementById('guestActions').style.display = 'none';
+            document.getElementById('userArea').style.display = 'flex';
+            document.getElementById('userRoleBadge').textContent = currentUser.role.toUpperCase();
+            document.getElementById('userRoleBadge').className = `role-badge role-${currentUser.role}`;
+            document.getElementById('userAvatar').textContent = currentUser.name[0].toUpperCase();
+            document.getElementById('welcomeRoleBadge').textContent = currentUser.role.toUpperCase();
+            document.getElementById('welcomeRoleBadge').className = `role-badge role-${currentUser.role}`;
+            document.body.classList.add(`role-${currentUser.role}`);
+            if (currentUser.role === 'admin') document.body.classList.add('admin-access');
+            document.getElementById('guestLanding').style.display = 'none';
+            document.getElementById('mainDashboard').style.display = 'block';
+            renderRoleDashboard();
+        }
+        window.logout = () => {
+            if (interval) clearInterval(interval);
+            currentUser = null;
+            document.body.classList.remove('role-admin', 'role-household', 'role-collector', 'role-recycler', 'admin-access');
+            document.getElementById('guestActions').style.display = 'flex';
+            document.getElementById('userArea').style.display = 'none';
+            document.getElementById('guestLanding').style.display = 'block';
+            document.getElementById('mainDashboard').style.display = 'none';
+            localStorage.removeItem('waste_session');
+            trackEvent('auth', 'logout', 'user');
+        };
+        window.toggleUserMenu = () => {
+            const dd = document.getElementById('userDropdown');
+            dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
+        };
+
+        // ========== RENDERING ==========
+        function renderRoleDashboard() {
+            renderStats();
+            renderActivity();
+            renderAdminPanel();
+            renderGuestShop();
+        }
+
+        function renderStats() {
+            const container = document.getElementById('overviewTab');
+            const role = currentUser.role;
+            let stats = [];
+            if (role === 'admin') {
+                stats = [
+                    { label: '👥 Households', value: allUsers.filter(u => u.role === 'household').length },
+                    { label: '🚛 Collectors', value: allUsers.filter(u => u.role === 'collector').length },
+                    { label: '♻️ Recyclers', value: allUsers.filter(u => u.role === 'recycler').length },
+                    { label: '📦 Orders', value: allOrders.length },
+                    { label: '💰 Revenue', value: `KSh ${allOrders.reduce((s, o) => s + o.price, 0).toLocaleString()}` },
+                    { label: '🗑️ Full Bins', value: smartBins.filter(b => b.fullness >= 95).length }
+                ];
+            } else if (role === 'household') {
+                stats = [
+                    { label: '💰 Wallet', value: `KSh ${currentUser.balance?.toLocaleString() || '0'}` },
+                    { label: '📦 My Bins', value: smartBins.filter(b => b.householdId === currentUser.id).length },
+                    { label: '📋 Requests', value: collectionRequests.filter(c => c.householdId === currentUser.id).length }
+                ];
+            } else if (role === 'collector') {
+                stats = [
+                    { label: '💰 Earnings', value: `KSh ${currentUser.balance?.toLocaleString() || '0'}` },
+                    { label: '🚚 Active Jobs', value: collectionRequests.filter(c => c.assignedCollectorId === currentUser.id && c.status !== 'completed').length },
+                    { label: '✅ Completed', value: collectionRequests.filter(c => c.assignedCollectorId === currentUser.id && c.status === 'completed').length }
+                ];
+            } else if (role === 'recycler') {
+                stats = [
+                    { label: '💰 Balance', value: `KSh ${currentUser.balance?.toLocaleString() || '0'}` },
+                    { label: '♻️ Processed', value: recyclingOrders.filter(r => r.recyclerId === currentUser.id).reduce((s, r) => s + r.weight, 0).toFixed(1) + 'kg' },
+                    { label: '📋 Orders', value: recyclingOrders.filter(r => r.recyclerId === currentUser.id).length }
+                ];
+            }
+            container.innerHTML = stats.map(stat => `
+                <div class="stat-card">
+                    <div class="stat-number">${stat.value}</div>
+                    <div style="font-size:1.1rem;">${stat.label}</div>
+                    ${role === 'household' && stat.label === '💰 Wallet' ? '<button class="btn btn-sm btn-outline mt-2" onclick="addFunds()">+ Add Funds</button>' : ''}
+                </div>
+            `).join('');
+        }
+
+        function renderActivity() {
+            const container = document.getElementById('activityTab');
+            const role = currentUser.role;
+            let content = '';
+            if (role === 'household') {
+                const bins = smartBins.filter(b => b.householdId === currentUser.id);
+                content = `<div><h3>Your Smart Bins</h3>`;
+                bins.forEach(bin => {
+                    const isFull = bin.fullness >= 95;
+                    content += `
+                        <div class="glass-card" style="padding:1.5rem; margin-bottom:1.5rem;">
+                            <div style="display:flex; justify-content:space-between;"><strong>${bin.name}</strong><button class="btn btn-sm btn-outline" onclick="addNewBin()">+ Add Bin</button></div>
+                            <div>Fullness: ${bin.fullness}%</div>
+                            <div class="progress-bar"><div class="progress-fill" style="width:${bin.fullness}%; background:${isFull ? '#e53e3e' : '#48bb78'};"></div></div>
+                            ${isFull ? '<div class="full-warning">⚠️ BIN FULL! Schedule collection.</div>' : ''}
+                            <div><strong>Composition:</strong> ${Object.entries(bin.composition).map(([k, v]) => `${k}: ${v}%`).join(', ')}</div>
+                            <div style="margin-top:0.5rem;">
+                                <button class="btn btn-primary btn-sm" onclick="simulateSensorUpdate(${bin.id})">🔄 Simulate Waste</button>
+                                <button class="btn btn-success btn-sm ml-2" onclick="classifyWasteForBin(${bin.id})">🤖 AI Classify</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                content += `
+                    <div style="display:flex; gap:2rem; flex-wrap:wrap; margin:1rem 0;">
+                        <div style="flex:1;"><h3>📅 Schedule Collection</h3><select id="wasteTypeSelect" class="input-field"><option>Plastic</option><option>Organic</option><option>Paper</option><option>Metal</option><option>E-waste</option></select><button class="btn btn-success w-full mt-2" onclick="requestCollection()">Request Pickup</button></div>
+                        <div style="flex:1;"><h3>🛒 Quick Buy</h3>${products.slice(0, 2).map(p => `<div class="product-tile glass-card p-2"><div class="product-icon">${p.icon}</div><div>${p.name}</div><div class="product-price">KSh ${p.price}</div><button class="btn btn-primary btn-sm w-full" onclick="buyProduct(${p.id}, '${p.name}', ${p.price})">Buy</button></div>`).join('')}</div>
                     </div>
-                </div>
-                <div class="card">
-                    <div class="card-header"><i class="fas fa-charging-station"></i><h3>Smart Bin Status</h3></div>
-                    <div class="card-body">
-                        <div class="fill-level"><span>Fill Level</span><span id="fillLevel">35</span>%</div>
-                        <div class="progress-bar"><div class="progress-fill" id="fillProgressFill" style="width:35%"></div></div>
-                        <button id="simulateFillBtn" class="btn btn-outline"><i class="fas fa-plus"></i> Simulate Fill +20%</button>
+                    <h3>My Collections</h3>
+                    ${collectionRequests.filter(c => c.householdId === currentUser.id).map(c => `<div class="list-item">${c.wasteType} · ${new Date(c.date).toLocaleDateString()} · <span class="role-badge">${c.status.toUpperCase()}</span>${c.proofImage ? ' 📸' : ''}</div>`).join('') || '<div class="list-item">No requests yet</div>'}
+                `;
+            } else if (role === 'collector') {
+                const myTasks = collectionRequests.filter(c => c.assignedCollectorId === currentUser.id && c.status !== 'completed');
+                const pendingRequests = collectionRequests.filter(c => c.status === 'pending' && !c.assignedCollectorId);
+                content = `
+                    <h3>🚚 My Active Tasks (${myTasks.length})</h3>
+                    ${myTasks.map(task => `<div class="list-item"><div>${task.wasteType} · ${new Date(task.date).toLocaleDateString()}</div><div><span class="role-badge">${task.status}</span><button class="btn btn-sm btn-success ml-2" onclick="completeTaskWithPhoto(${task.id}, 250)">✅ Complete + Photo</button></div></div>`).join('') || '<div class="list-item">No active tasks.</div>'}
+                    <h3 class="mt-2">📋 Available Collection Requests (${pendingRequests.length})</h3>
+                    ${pendingRequests.map(req => {
+                    const household = allUsers.find(u => u.id === req.householdId);
+                    return `<div class="list-item"><div>${household?.name || 'Unknown'} · ${req.wasteType}</div><button class="btn btn-sm btn-primary" onclick="acceptCollectionRequest(${req.id})">📌 Accept</button></div>`;
+                }).join('') || '<div class="list-item">No pending requests.</div>'}
+                    <h3 class="mt-2">🗑️ Full Bins (Auto-notify)</h3>
+                    ${smartBins.filter(b => b.fullness >= 95).map(b => {
+                    const household = allUsers.find(u => u.id === b.householdId);
+                    return `<div class="list-item">Household: ${household?.name} · Bin: ${b.name} · Fullness ${b.fullness}%<button class="btn btn-sm btn-success ml-2" onclick="autoAssignAndCollect(${b.householdId})">Collect Now</button></div>`;
+                }).join('') || '<div class="list-item">No critically full bins</div>'}
+                `;
+            } else if (role === 'recycler') {
+                const collectedWaste = collectionRequests.filter(c => c.status === 'completed' && !c.recycled);
+                content = `
+                    <div style="display:flex; gap:2rem; margin-bottom:2rem;">
+                        <div style="flex:1;"><h3>♻️ Process Materials</h3><input id="materialInput" class="input-field mb-2" placeholder="Material (Plastic, Glass...)"><input id="weightInput" type="number" class="input-field mb-2" placeholder="Weight (kg)"><button class="btn btn-success w-full" onclick="processRecycling()">Process & Earn</button></div>
+                        <div style="flex:1;"><h3>📦 Available Collected Waste</h3>${collectedWaste.map(w => `<div class="list-item">${w.wasteType} from ${allUsers.find(u => u.id === w.householdId)?.name}<button class="btn btn-sm btn-primary" onclick="recycleCollectedWaste(${w.id}, '${w.wasteType}')">Recycle (earn)</button></div>`).join('') || '<div>No waste awaiting recycling</div>'}</div>
                     </div>
-                </div>
-                <div class="card">
-                    <div class="card-header"><i class="fas fa-history"></i><h3>Recent Requests</h3></div>
-                    <div class="card-body"><div id="householdRequestsList" class="history-list"><div class="empty-state">No requests yet</div></div></div>
-                </div>
-            </div>
-        </div>
+                    <h3>Recycling History</h3>
+                    ${recyclingOrders.filter(r => r.recyclerId === currentUser.id).slice(-5).map(o => `<div class="list-item">${o.material} · ${o.weight}kg → KSh ${o.amount}</div>`).join('') || 'No history yet'}
+                `;
+            } else if (role === 'admin') {
+                content = `
+                    <h3>🌍 All Smart Bins</h3>
+                    ${smartBins.map(b => {
+                    const owner = allUsers.find(u => u.id === b.householdId);
+                    return `<div class="list-item"><div><strong>${owner?.name || 'Unknown'}</strong> - ${b.name}<br>Fullness: ${b.fullness}%<div class="progress-bar" style="width:150px; display:inline-block; margin-left:10px;"><div class="progress-fill" style="width:${b.fullness}%; background:#48bb78;"></div></div></div><div><span class="role-badge">${b.fullness >= 95 ? 'FULL' : 'Ok'}</span></div></div>`;
+                }).join('')}
+                    <h3 class="mt-2">📋 Collection Requests</h3>
+                    <div><button class="btn btn-sm btn-primary" onclick="bulkAssign()">⚡ Bulk Assign Selected</button></div>
+                    <div id="bulkAssignList">${collectionRequests.map(c => {
+                    const user = allUsers.find(u => u.id === c.householdId);
+                    return `<div class="list-item"><input type="checkbox" class="bulk-check" data-id="${c.id}"><div>${user?.name} · ${c.wasteType}</div><div><span class="role-badge">${c.status}</span><button class="btn btn-sm btn-success ml-2" onclick="adminAssignCollector(${c.id})">Assign</button>${c.proofImage ? ' 📸' : ''}</div></div>`;
+                }).join('') || '<div class="list-item">No requests</div>'}</div>
+                `;
+            }
+            container.innerHTML = content;
+        }
 
-        <!-- Collector Dashboard -->
-        <div id="collectorDashboard" class="dashboard">
-            <div class="dashboard-header"><h2><i class="fas fa-truck"></i> Collector Dashboard</h2><p>View and manage pickup requests</p></div>
-            <div class="dashboard-grid">
-                <div class="card card-full"><div class="card-header"><i class="fas fa-clock"></i><h3>Pending Pickups</h3></div><div class="card-body"><div id="pendingRequestsList" class="requests-list"><div class="empty-state">No pending requests</div></div></div></div>
-                <div class="card card-full"><div class="card-header"><i class="fas fa-check-circle"></i><h3>Recently Completed</h3></div><div class="card-body"><ul id="completedLog" class="completed-list" style="list-style:none;"></ul></div></div>
-            </div>
-        </div>
+        function renderAdminPanel() {
+            const container = document.getElementById('adminTab');
+            container.innerHTML = `<div class="stats-grid"><div class="glass-card p-4"><h3>👥 Users</h3><div>Total: ${allUsers.length}</div><button class="btn btn-primary mt-2" onclick="seedMoreData()">🌱 Add Demo Data</button><button class="btn btn-warning ml-2" onclick="resetDemo()">🔄 Reset</button></div><div class="glass-card p-4"><h3>💰 Revenue</h3><div style="font-size:2.5rem;">KSh ${allOrders.reduce((s, o) => s + o.price, 0).toLocaleString()}</div></div></div><canvas id="fullnessChart" width="400" height="200"></canvas>`;
+            const ctx = document.getElementById('fullnessChart')?.getContext('2d');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: smartBins.map(b => b.name.substring(0, 10)),
+                        datasets: [{ label: 'Fullness %', data: smartBins.map(b => b.fullness), borderColor: '#48bb78', tension: 0.3 }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: true }
+                });
+            }
+        }
 
-        <!-- Recycler Dashboard -->
-        <div id="recyclerDashboard" class="dashboard">
-            <div class="dashboard-header"><h2><i class="fas fa-factory"></i> Recycler Dashboard</h2><p>Manage sorted waste inventory</p></div>
-            <div class="dashboard-grid">
-                <div class="card"><div class="card-header"><i class="fas fa-boxes"></i><h3>Sorted Waste Inventory</h3></div><div class="card-body"><div id="wasteInventory" class="inventory-grid"></div><button id="scheduleRecyclerPickupBtn" class="btn btn-primary"><i class="fas fa-calendar-alt"></i> Schedule Bulk Pickup</button><div id="recyclerMsg" class="status-message"></div></div></div>
-                <div class="card"><div class="card-header"><i class="fas fa-chart-line"></i><h3>Performance KPIs</h3></div><div class="card-body"><div class="kpi-item"><span>♻️ Plastic</span><strong>124 kg</strong></div><div class="kpi-item"><span>📄 Paper</span><strong>86 kg</strong></div><div class="kpi-item"><span>🥫 Metal</span><strong>42 kg</strong></div><div class="kpi-item"><span>🍂 Organic</span><strong>98 kg</strong></div></div></div>
-            </div>
-        </div>
+        function renderGuestShop() {
+            document.getElementById('guestShopGrid').innerHTML = products.map(p => `<div class="glass-card product-tile"><div class="product-icon">${p.icon}</div><h4>${p.name}</h4><p>${p.desc}</p><div class="product-price">KSh ${p.price.toLocaleString()}</div><button class="btn btn-primary" onclick="openAuthModal()">Login to Buy</button></div>`).join('');
+        }
 
-        <!-- Analytics Dashboard -->
-        <div id="analyticsDashboard" class="dashboard">
-            <div class="dashboard-header"><h2><i class="fas fa-chart-line"></i> Analytics Dashboard</h2><p>System-wide impact metrics</p></div>
-            <div class="dashboard-grid">
-                <div class="card"><div class="card-header"><i class="fas fa-chart-bar"></i><h3>Waste Collected by Type</h3></div><div class="card-body"><div id="totalWasteStats" class="stats-list"></div></div></div>
-                <div class="card"><div class="card-header"><i class="fas fa-globe-africa"></i><h3>Environmental Impact</h3></div><div class="card-body"><div class="impact-metric"><span>Recycling Rate</span><strong id="recyclingRate">0%</strong></div><div class="impact-metric"><span>Completed Pickups</span><strong id="totalPickupsCompleted">0</strong></div><div class="impact-metric"><span>CO₂ Avoided</span><strong>187 kg</strong></div></div></div>
-            </div>
-        </div>
-    </main>
+        // ========== ACTIONS ==========
+        window.simulateSensorUpdate = (binId) => {
+            const bin = smartBins.find(b => b.id === binId);
+            if (bin) {
+                let increase = Math.floor(Math.random() * 15) + 5;
+                bin.fullness = Math.min(100, bin.fullness + increase);
+                let types = ['plastic', 'organic', 'paper', 'glass', 'metal'];
+                let adjust = types[Math.floor(Math.random() * types.length)];
+                bin.composition[adjust] = Math.min(70, bin.composition[adjust] + Math.floor(Math.random() * 10) + 2);
+                let total = Object.values(bin.composition).reduce((a, b) => a + b, 0);
+                if (total !== 100) {
+                    let factor = 100 / total;
+                    for (let k in bin.composition) bin.composition[k] = Math.round(bin.composition[k] * factor);
+                }
+                bin.lastUpdated = new Date().toISOString();
+                persistAll();
+                if (bin.fullness >= 95) addNotification(currentUser.id, `⚠️ ${bin.name} is now ${bin.fullness}% full!`, 'warning');
+                renderRoleDashboard();
+                showToast(`Sensor updated: ${bin.name} is ${bin.fullness}% full`, 'info');
+                trackEvent('bin', 'simulate', bin.name);
+            }
+        };
+        window.classifyWasteForBin = (binId) => {
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/jpeg,image/png,image/webp';
+            fileInput.onchange = (e) => {
+                const file = e.target.files[0];
+                const validation = validateImage(file);
+                if (!validation.valid) { showToast(validation.error, 'error'); return; }
+                const img = new Image();
+                img.onload = () => {
+                    classifyWasteWithAI(img, binId, (wasteType, rawLabel) => {
+                        const bin = smartBins.find(b => b.id === binId);
+                        if (bin) {
+                            updateBinCompositionWithWaste(bin, wasteType, 5);
+                            renderRoleDashboard();
+                            showToast(`AI classified as ${wasteType} (${rawLabel}) → composition updated`, 'success');
+                            trackEvent('ai', 'classify', wasteType);
+                        }
+                    });
+                };
+                img.src = URL.createObjectURL(file);
+            };
+            fileInput.click();
+        };
+        window.addNewBin = () => {
+            if (currentUser.role !== 'household') return;
+            const newBin = {
+                id: Date.now(),
+                householdId: currentUser.id,
+                name: `Bin ${smartBins.filter(b => b.householdId === currentUser.id).length + 1}`,
+                fullness: 0,
+                composition: { plastic: 25, organic: 25, paper: 20, glass: 15, metal: 15 },
+                lastUpdated: new Date().toISOString()
+            };
+            smartBins.push(newBin);
+            persistAll();
+            renderRoleDashboard();
+            showToast('New bin added!', 'success');
+            trackEvent('bin', 'added', newBin.name);
+        };
+        window.requestCollection = () => {
+            const wasteType = sanitizeInput(document.getElementById('wasteTypeSelect').value);
+            const req = { id: Date.now(), householdId: currentUser.id, wasteType, status: 'pending', date: new Date().toISOString() };
+            collectionRequests.push(req);
+            persistAll();
+            addNotification(currentUser.id, `Collection requested for ${wasteType}`, 'success');
+            broadcastToast(`New collection request from ${currentUser.name}`, 'info');
+            renderRoleDashboard();
+            trackEvent('collection', 'requested', wasteType);
+        };
+        window.acceptCollectionRequest = (reqId) => {
+            const req = collectionRequests.find(r => r.id === reqId);
+            if (req && req.status === 'pending') {
+                req.assignedCollectorId = currentUser.id;
+                req.status = 'assigned';
+                persistAll();
+                addNotification(req.householdId, `Your collection request has been accepted by ${currentUser.name}`, 'info');
+                broadcastToast(`${currentUser.name} accepted a collection request`, 'success');
+                renderRoleDashboard();
+                trackEvent('collection', 'accepted', reqId);
+            }
+        };
+        window.completeTaskWithPhoto = (taskId, reward) => {
+            const task = collectionRequests.find(t => t.id === taskId);
+            if (!task || task.assignedCollectorId !== currentUser.id) {
+                showToast('Task not found or not assigned to you', 'error');
+                return;
+            }
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/jpeg,image/png,image/webp';
+            fileInput.onchange = (e) => {
+                const file = e.target.files[0];
+                const validation = validateImage(file);
+                if (!validation.valid) { showToast(validation.error, 'error'); return; }
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    task.proofImage = ev.target.result;
+                    task.status = 'completed';
+                    task.completedDate = new Date().toISOString();
+                    currentUser.balance += reward;
+                    const userIdx = allUsers.findIndex(u => u.id === currentUser.id);
+                    if (userIdx > -1) allUsers[userIdx].balance = currentUser.balance;
+                    const bins = smartBins.filter(b => b.householdId === task.householdId);
+                    bins.forEach(bin => { bin.fullness = 0; for (let k in bin.composition) bin.composition[k] = 20; });
+                    persistAll();
+                    addNotification(task.householdId, `Your waste collection is complete!`, 'success');
+                    broadcastToast(`Collection completed by ${currentUser.name}`, 'success');
+                    showToast(`Task completed! +KSh ${reward}`, 'success');
+                    renderRoleDashboard();
+                    trackEvent('collection', 'completed', taskId);
+                };
+                reader.readAsDataURL(file);
+            };
+            fileInput.click();
+        };
+        window.recycleCollectedWaste = (collectionId, wasteType) => {
+            const collection = collectionRequests.find(c => c.id === collectionId);
+            if (collection && !collection.recycled) {
+                const rates = { 'Plastic': 45, 'Organic': 30, 'Paper': 25, 'Metal': 60, 'E-waste': 80 };
+                const rate = rates[wasteType] || 35;
+                const weight = Math.floor(Math.random() * 20) + 5;
+                const earnings = weight * rate;
+                recyclingOrders.push({
+                    id: Date.now(),
+                    recyclerId: currentUser.id,
+                    material: wasteType,
+                    weight,
+                    amount: earnings,
+                    date: new Date().toISOString()
+                });
+                collection.recycled = true;
+                currentUser.balance += earnings;
+                const userIdx = allUsers.findIndex(u => u.id === currentUser.id);
+                if (userIdx > -1) allUsers[userIdx].balance = currentUser.balance;
+                persistAll();
+                showToast(`Recycled ${weight}kg of ${wasteType} → +KSh ${earnings}`, 'success');
+                renderRoleDashboard();
+                trackEvent('recycling', 'processed', wasteType);
+            }
+        };
+        window.buyProduct = (id, name, price) => {
+            if (currentUser.balance < price) return showToast('Insufficient balance', 'error');
+            currentUser.balance -= price;
+            allOrders.push({ id: Date.now(), userId: currentUser.id, product: name, price, date: new Date().toISOString() });
+            const userIdx = allUsers.findIndex(u => u.id === currentUser.id);
+            if (userIdx > -1) allUsers[userIdx].balance = currentUser.balance;
+            persistAll();
+            showToast(`Purchased ${name} for KSh ${price}`, 'success');
+            renderRoleDashboard();
+            trackEvent('shop', 'purchase', name);
+        };
+        window.processRecycling = () => {
+            const material = sanitizeInput(document.getElementById('materialInput').value);
+            const weight = parseFloat(document.getElementById('weightInput').value);
+            if (!material || isNaN(weight) || weight <= 0) return showToast('Invalid material or weight', 'error');
+            const rates = { 'plastic': 45, 'glass': 30, 'metal': 60, 'paper': 25 };
+            const rate = rates[material.toLowerCase()] || 35;
+            const earnings = weight * rate;
+            recyclingOrders.push({ id: Date.now(), recyclerId: currentUser.id, material, weight, amount: earnings, date: new Date().toISOString() });
+            currentUser.balance += earnings;
+            const userIdx = allUsers.findIndex(u => u.id === currentUser.id);
+            if (userIdx > -1) allUsers[userIdx].balance = currentUser.balance;
+            persistAll();
+            showToast(`Processed ${weight}kg ${material} → +KSh ${earnings}`, 'success');
+            renderRoleDashboard();
+            trackEvent('recycling', 'manual', material);
+        };
+        window.adminAssignCollector = (collectionId) => {
+            const collectors = allUsers.filter(u => u.role === 'collector');
+            if (!collectors.length) return showToast('No collectors available', 'error');
+            const collector = collectors[Math.floor(Math.random() * collectors.length)];
+            const collection = collectionRequests.find(c => c.id === collectionId);
+            if (collection) { collection.assignedCollectorId = collector.id; collection.status = 'assigned'; persistAll(); showToast(`Assigned to ${collector.name}`, 'success'); renderRoleDashboard(); }
+        };
+        window.bulkAssign = () => {
+            const checkboxes = document.querySelectorAll('.bulk-check:checked');
+            if (checkboxes.length === 0) return showToast('Select at least one request', 'warning');
+            const collectors = allUsers.filter(u => u.role === 'collector');
+            if (!collectors.length) return showToast('No collectors available', 'error');
+            checkboxes.forEach(cb => {
+                const reqId = parseInt(cb.dataset.id);
+                const collection = collectionRequests.find(c => c.id === reqId);
+                if (collection && collection.status === 'pending') {
+                    const collector = collectors[Math.floor(Math.random() * collectors.length)];
+                    collection.assignedCollectorId = collector.id;
+                    collection.status = 'assigned';
+                }
+            });
+            persistAll();
+            showToast(`${checkboxes.length} requests assigned`, 'success');
+            renderRoleDashboard();
+        };
+        window.autoAssignAndCollect = (householdId) => {
+            const collector = allUsers.find(u => u.role === 'collector' && u.id === currentUser.id);
+            if (!collector) return showToast('Only collectors can accept', 'error');
+            const req = collectionRequests.find(c => c.householdId === householdId && c.status === 'pending');
+            if (req) {
+                req.assignedCollectorId = currentUser.id;
+                req.status = 'assigned';
+                persistAll();
+                showToast('Assigned to you!', 'success');
+                renderRoleDashboard();
+            } else showToast('No pending request for this household', 'warning');
+        };
+        window.addFunds = () => {
+            currentUser.balance += 5000;
+            const userIdx = allUsers.findIndex(u => u.id === currentUser.id);
+            if (userIdx > -1) allUsers[userIdx].balance = currentUser.balance;
+            persistAll();
+            showToast('Added KSh 5000', 'success');
+            renderRoleDashboard();
+        };
+        window.seedMoreData = () => {
+            if (collectionRequests.length < 3) {
+                const hh = allUsers.find(u => u.role === 'household');
+                if (hh) collectionRequests.push({ id: Date.now(), householdId: hh.id, wasteType: 'Demo', status: 'pending', date: new Date().toISOString() });
+            }
+            persistAll();
+            renderRoleDashboard();
+        };
+        window.resetDemo = () => { if (confirm('Reset all data except users?')) { collectionRequests = []; recyclingOrders = []; allOrders = []; smartBins = smartBins.filter(b => allUsers.some(u => u.id === b.householdId)); persistAll(); renderRoleDashboard(); } };
 
-    <script src="app.js"></script>
+        // ========== NAVIGATION ==========
+        function showTab(tabName) {
+            document.querySelectorAll('#overviewTab, #activityTab, #adminTab, #profilePanel').forEach(t => t.style.display = 'none');
+            if (tabName === 'profile') {
+                document.getElementById('profilePanel').style.display = 'block';
+                document.getElementById('profilePanel').innerHTML = `<div><h2>👤 Profile</h2><div>Name: ${currentUser.name}</div><div>Email: ${currentUser.email}</div><div>Role: ${currentUser.role}</div><div>Balance: KSh ${currentUser.balance}</div><button class="btn btn-primary mt-2" onclick="showTab('overview');">← Back</button></div>`;
+            } else {
+                document.getElementById(tabName + 'Tab').style.display = 'block';
+                if (tabName === 'activity') renderActivity();
+                else if (tabName === 'overview') renderStats();
+                else if (tabName === 'admin') renderAdminPanel();
+            }
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            if (event && event.target) event.target.classList.add('active');
+        }
+        document.getElementById('dashboardTabs').addEventListener('click', (e) => { if (e.target.classList.contains('nav-tab')) showTab(e.target.dataset.tab); });
+        document.addEventListener('click', (e) => { if (e.target.classList.contains('modal-overlay')) closeAuthModal(); if (!e.target.closest('#userArea')) document.getElementById('userDropdown').style.display = 'none'; });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeAuthModal(); document.getElementById('userDropdown').style.display = 'none'; } });
+        const session = localStorage.getItem('waste_session');
+        if (session) { try { currentUser = JSON.parse(session); updateUIAfterLogin(); startRealTimeSimulation(); } catch (e) { } }
+        renderGuestShop();
+    </script>
 </body>
+
 </html>
+
+    
+
+ 
